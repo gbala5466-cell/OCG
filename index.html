@@ -1,0 +1,504 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCG Automation</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Inline fallback styles for the requirements form to ensure proper alignment */
+    .requirements-card { padding: 1rem; border-radius: 12px; background: #fff; border: 1px solid rgba(0,0,0,0.04); }
+    .requirement-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0.6rem; align-items: start; }
+    .requirement-field { display:flex; flex-direction:column; gap:6px; font-weight:700; color:#335; }
+    .requirement-field span { font-size: 1rem; line-height: 1.25; color: #0f172a; }
+    .requirement-field input, .requirement-field select, .requirement-field textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #d6dbe8; background:#fff; font:inherit; }
+    .phone-row .phone-controls { display: flex; gap: 0.9rem; align-items: center; }
+    .country-picker { position: relative; min-width: 260px; max-width: 100%; }
+    .country-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 14px 16px; border-radius: 14px; border: 1px solid #d6dbe8; background: #f8fafc; color: #0f172a; font: 600 1rem system-ui, sans-serif; cursor: pointer; }
+    .country-trigger:hover, .country-trigger:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14); }
+    .country-trigger::after { content: '▾'; color: #6b7280; font-size: 0.95rem; margin-left: 0.5rem; }
+    /* Make the emoji flag highly visible: larger with a contrast circular background */
+    .country-trigger .country-emoji { font-size: 1.6rem; width: 2.2rem; height: 2.2rem; display: inline-flex; justify-content: center; align-items: center; border-radius: 999px; background: linear-gradient(180deg,#fff,#f1f5f9); box-shadow: 0 6px 16px rgba(15,23,42,0.08); border: 1px solid rgba(15,23,42,0.04); }
+    .country-trigger .country-text { flex: 1 1 auto; min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 0.5rem; }
+    /* Increase the dialing code size and contrast */
+    .country-trigger .country-code { color: #0f172a; font-weight: 700; font-size: 1.02rem; margin-left: 0.5rem; }
+    /* Make the phone label larger for visibility */
+    .phone-row > span { font-size: 1.02rem; font-weight: 800; color: #071028; }
+    .country-options { position: absolute; left: 0; right: 0; top: calc(100% + 0.45rem); z-index: 10; max-height: 260px; overflow-y: auto; background: #fff; border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 16px; box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12); padding: 8px 0; display: none; }
+
+      /* enlarge left contact details for readability */
+      .contact-copy p,
+      .contact-copy .role,
+      .contact-copy .email,
+      .contact-copy .contact-meta {
+        font-size: 1.02rem;
+        line-height: 1.35;
+      }
+    .country-options.open { display: block; }
+    .country-option { display: flex; align-items: center; gap: 0.75rem; padding: 10px 14px; cursor: pointer; color: #12263f; font: 500 0.95rem system-ui, sans-serif; }
+    .country-option:hover, .country-option[aria-selected="true"] { background: #eef2ff; }
+    .country-option .flag { width: 1.3rem; font-size: 1.2rem; }
+    .country-option .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .country-option .dial { color: #475569; margin-left: auto; }
+    .phone-input { flex: 1 1 auto; min-width: 0; }
+    .requirement-field.full { grid-column: 1 / -1; }
+    .requirement-field textarea { min-height:120px; resize:vertical; }
+    .submit-btn { grid-column: 1 / -1; justify-self:start; padding:8px 12px; border-radius:8px; background:#16a34a; color:#fff; border:none; font-weight:700; cursor:pointer; }
+    @media (max-width:680px) { .requirement-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="brand-lockup">
+        <div class="logo-frame" aria-hidden="true">
+          <img src="assets/ocg-logo.png" alt="OCG logo" class="brand-logo" />
+        </div>
+        <div class="brand-copy">
+          <p class="eyebrow">OSHO COLOR GALAXY Automation</p>
+          <h1>Smart automation and quality offset printing.</h1>
+          <p class="lede">A clean OCG home page with the exact logo, fixed contact details, and a link to the offset gallery.</p>
+        </div>
+      </div>
+
+      <nav class="header-actions" aria-label="Primary">
+        <a class="btn primary" href="automation.html">Automation</a>
+        <a class="btn primary" href="offset.html">Offset</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Osho Colour Galaxy</p>
+          <h2>Automation solutions built for modern industry.</h2>
+          <p>
+            OCG combines engineering, printing support, and production automation into one polished brand presence.
+          </p>
+          <div class="hero-buttons">
+            <a class="status-pill" href="#contact" onclick="showContact(event)">Contact</a>
+            <a class="status-pill" href="#services">Services</a>
+          </div>
+        </div>
+        <div class="hero-img-wrap" style="max-width:320px; max-height:220px; width:320px; height:220px;">
+          <img src="image/chatgpt-ocg.png" alt="OCG Automation" class="hero-main-img" style="width:320px; height:220px; object-fit:cover;" />
+        </div>
+      </section>
+      <!-- Full-page contact overlay -->
+      <div class="contact-overlay" id="contactOverlay" aria-modal="true" role="dialog">
+        <div class="contact-panel">
+          <button class="contact-close" onclick="hideContact()" aria-label="Close">&#10005;</button>
+      <section class="contact-grid" id="contact" aria-label="Contact information">
+        <article class="contact-card contact-card-wide">
+          <div class="contact-copy">
+            <p  class="card-kicker"><h3><u>Contact</u></h3></p>
+            <p>Nagarajan.T</p>
+            <p class="role">Automation Engineer</p>
+             <a class="email contact-link" href="mailto:oshocolorgalaxyautomation.com">oshocolorgalaxyautomation.com</a>
+            <p class="contact-meta">3/1289, Meera Colony, Sivakasi - 626189</p>
+          </div>
+
+          <!-- Requirement Options Form -->
+          <div class="req-form">
+
+            <div class="req-field">
+              <fieldset class="req-fieldset">
+                <legend class="req-legend">Describe Your Requirement</legend>
+                <textarea id="req-desc" placeholder="I would like to..."></textarea>
+              </fieldset>
+              <p class="req-err" id="err-desc">Kindly Describe Your Requirement.</p>
+            </div>
+
+            <div class="req-field">
+              <div class="phone-wrap" id="phoneWrap">
+                <button type="button" class="flag-btn" id="flagBtn" onclick="toggleDial(event)">
+                  <img class="flag-img" id="flagImg" src="https://flagcdn.com/w40/in.png" alt="IN" />
+                  <span class="flag-arrow">&#9660;</span>
+                  <span class="flag-code">+91</span>
+                </button>
+                <div class="flag-divider"></div>
+                <input type="tel" id="req-phone" placeholder="Enter Your Number" />
+              </div>
+              <div class="dial-dropdown" id="dialList">
+                <div class="dial-search-wrap">
+                  <input type="text" class="dial-search" id="dialSearch" placeholder="&#128269; Search country..." oninput="filterDial(this.value)" onclick="event.stopPropagation()" />
+                </div>
+                <ul class="dial-ul" id="dialUl">
+                  <li onclick="pickDial('in','India','+91')"><img src="https://flagcdn.com/w40/in.png" alt="IN"/><span class="dl-name">India</span><span class="dl-code">+91</span></li>
+                  <li onclick="pickDial('us','USA','+1')"><img src="https://flagcdn.com/w40/us.png" alt="US"/><span class="dl-name">USA</span><span class="dl-code">+1</span></li>
+                  <li onclick="pickDial('gb','UK','+44')"><img src="https://flagcdn.com/w40/gb.png" alt="GB"/><span class="dl-name">UK</span><span class="dl-code">+44</span></li>
+                  <li onclick="pickDial('au','Australia','+61')"><img src="https://flagcdn.com/w40/au.png" alt="AU"/><span class="dl-name">Australia</span><span class="dl-code">+61</span></li>
+                  <li onclick="pickDial('ae','UAE','+971')"><img src="https://flagcdn.com/w40/ae.png" alt="AE"/><span class="dl-name">UAE</span><span class="dl-code">+971</span></li>
+                  <li onclick="pickDial('sg','Singapore','+65')"><img src="https://flagcdn.com/w40/sg.png" alt="SG"/><span class="dl-name">Singapore</span><span class="dl-code">+65</span></li>
+                  <li onclick="pickDial('ca','Canada','+1')"><img src="https://flagcdn.com/w40/ca.png" alt="CA"/><span class="dl-name">Canada</span><span class="dl-code">+1</span></li>
+                  <li onclick="pickDial('de','Germany','+49')"><img src="https://flagcdn.com/w40/de.png" alt="DE"/><span class="dl-name">Germany</span><span class="dl-code">+49</span></li>
+                  <li onclick="pickDial('fr','France','+33')"><img src="https://flagcdn.com/w40/fr.png" alt="FR"/><span class="dl-name">France</span><span class="dl-code">+33</span></li>
+                  <li onclick="pickDial('jp','Japan','+81')"><img src="https://flagcdn.com/w40/jp.png" alt="JP"/><span class="dl-name">Japan</span><span class="dl-code">+81</span></li>
+                  <li onclick="pickDial('cn','China','+86')"><img src="https://flagcdn.com/w40/cn.png" alt="CN"/><span class="dl-name">China</span><span class="dl-code">+86</span></li>
+                  <li onclick="pickDial('br','Brazil','+55')"><img src="https://flagcdn.com/w40/br.png" alt="BR"/><span class="dl-name">Brazil</span><span class="dl-code">+55</span></li>
+                  <li onclick="pickDial('my','Malaysia','+60')"><img src="https://flagcdn.com/w40/my.png" alt="MY"/><span class="dl-name">Malaysia</span><span class="dl-code">+60</span></li>
+                  <li onclick="pickDial('za','South Africa','+27')"><img src="https://flagcdn.com/w40/za.png" alt="ZA"/><span class="dl-name">South Africa</span><span class="dl-code">+27</span></li>
+                  <li onclick="pickDial('sa','Saudi Arabia','+966')"><img src="https://flagcdn.com/w40/sa.png" alt="SA"/><span class="dl-name">Saudi Arabia</span><span class="dl-code">+966</span></li>
+                  <li onclick="pickDial('kr','South Korea','+82')"><img src="https://flagcdn.com/w40/kr.png" alt="KR"/><span class="dl-name">South Korea</span><span class="dl-code">+82</span></li>
+                  <li onclick="pickDial('id','Indonesia','+62')"><img src="https://flagcdn.com/w40/id.png" alt="ID"/><span class="dl-name">Indonesia</span><span class="dl-code">+62</span></li>
+                  <li onclick="pickDial('ph','Philippines','+63')"><img src="https://flagcdn.com/w40/ph.png" alt="PH"/><span class="dl-name">Philippines</span><span class="dl-code">+63</span></li>
+                  <li onclick="pickDial('nz','New Zealand','+64')"><img src="https://flagcdn.com/w40/nz.png" alt="NZ"/><span class="dl-name">New Zealand</span><span class="dl-code">+64</span></li>
+                  <li onclick="pickDial('it','Italy','+39')"><img src="https://flagcdn.com/w40/it.png" alt="IT"/><span class="dl-name">Italy</span><span class="dl-code">+39</span></li>
+                </ul>
+              </div>
+              <p class="req-err" id="err-phone">Please enter your mobile number.</p>
+            </div>
+
+            <div class="req-field">
+              <fieldset class="req-fieldset">
+                <legend class="req-legend">Name</legend>
+                <input type="text" id="req-name" placeholder="Enter your name" />
+              </fieldset>
+            </div>
+
+            <button class="req-submit" id="reqSubmitBtn" onclick="submitReq()">Submit</button>
+          </div>
+        </article>
+      </section>
+        </div>
+      </div>
+
+      <section class="features-section" id="services">
+        <article class="feature-item">
+          <h3>Automation Engineering</h3>
+          <p>Build efficient workflows that reduce manual effort and keep production moving.</p>
+        </article>
+        <article class="feature-item">
+          <h3>Offset Printing Support</h3>
+          <p>Connect automation with printing operations for smoother, more reliable output.</p>
+        </article>
+        <article class="feature-item">
+          <h3>Quality Control</h3>
+          <p>Keep every step visible with a layout designed for clarity, trust, and speed.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>OCG Automation - built around the exact logo, contact details, and a clean brand-first layout.</p>
+    </footer>
+  </div>
+
+  <style>
+    /* ── Requirement Form ── */
+    .req-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: reqFadeIn 0.55s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes reqFadeIn {
+      from { opacity:0; transform:translateY(18px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* fieldset style matching screenshot */
+    .req-fieldset {
+      border: 1.5px solid #b0b8c1;
+      border-radius: 7px;
+      padding: 6px 14px 12px;
+      margin: 0;
+      background: #fff;
+      transition: border-color 0.22s, box-shadow 0.22s;
+    }
+    .req-fieldset:focus-within {
+      border-color: #0b6b61;
+      box-shadow: 0 0 0 3px rgba(11,107,97,0.13);
+    }
+    .req-legend {
+      font-size: 0.78rem;
+      color: #6b7280;
+      padding: 0 5px;
+      font-family: system-ui, sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .req-fieldset textarea,
+    .req-fieldset input[type="text"] {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font: inherit;
+      font-size: 0.97rem;
+      color: #1a1a2e;
+      resize: vertical;
+      padding: 2px 0;
+    }
+    .req-fieldset textarea { min-height: 82px; }
+    .req-fieldset textarea::placeholder,
+    .req-fieldset input::placeholder { color: #b0b8c1; }
+
+    /* phone row */
+    .phone-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border: 1.5px solid #b0b8c1;
+      border-radius: 7px;
+      background: #fff;
+      overflow: visible;
+      transition: border-color 0.22s, box-shadow 0.22s;
+    }
+    .phone-wrap:focus-within {
+      border-color: #0b6b61;
+      box-shadow: 0 0 0 3px rgba(11,107,97,0.13);
+    }
+    .flag-btn {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      background: none;
+      border: none;
+      padding: 10px 4px 10px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.18s;
+      border-radius: 6px 0 0 6px;
+    }
+    .flag-btn:hover { background: rgba(11,107,97,0.07); }
+    .flag-img {
+      width: 26px;
+      height: 18px;
+      object-fit: cover;
+      border-radius: 3px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+      display: block;
+      flex-shrink: 0;
+    }
+    .flag-arrow { font-size: 0.65rem; color: #6b7280; margin-top: 1px; }
+    .flag-code  { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; letter-spacing: 0.01em; }
+    .flag-divider {
+      width: 1px; height: 22px;
+      background: #d1d5db;
+      flex-shrink: 0;
+    }
+    #req-phone {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 11px 8px;
+      font: inherit;
+      font-size: 0.97rem;
+      color: #1a1a2e;
+      background: transparent;
+    }
+    #req-phone::placeholder { color: #b0b8c1; }
+
+    /* dropdown — opens downward in normal flow, pushes content below */
+    .dial-dropdown {
+      display: none;
+      position: static;
+      z-index: 9999;
+      background: #fff;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      min-width: 230px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.13);
+      overflow: hidden;
+      margin-top: 5px;
+      animation: dropIn 0.18s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes dropIn {
+      from { opacity:0; transform:translateY(-6px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .dial-dropdown.open { display: block; }
+    .dial-search-wrap {
+      padding: 8px 10px 6px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fafafa;
+    }
+    .dial-search {
+      width: 100%;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 0.88rem;
+      outline: none;
+      background: #fff;
+      color: #1a1a2e;
+      transition: border-color 0.18s;
+    }
+    .dial-search:focus { border-color: #0b6b61; }
+    .dial-ul {
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+      max-height: 210px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+    .dial-ul li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 0.91rem;
+      color: #1a1a2e;
+      transition: background 0.13s;
+    }
+    .dial-ul li:hover { background: #f0fdf4; }
+    .dial-ul li img { width: 24px; height: 16px; object-fit: cover; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.18); flex-shrink: 0; }
+    .dl-name { flex:1; font-weight:500; }
+    .dl-code  { color:#6b7280; font-size:0.83rem; font-weight:600; }
+
+    /* error messages */
+    .req-err {
+      color: #c62828;
+      font-size: 0.82rem;
+      font-family: system-ui, sans-serif;
+      text-align: right;
+      margin: 3px 0 0;
+      display: none;
+      animation: errShake 0.3s ease;
+    }
+    @keyframes errShake {
+      0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}
+    }
+    .req-err.show { display: block; }
+
+    /* ── Contact Overlay ── */
+    .contact-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+    }
+    .contact-overlay.open {
+      display: flex;
+    }
+    .contact-panel {
+      position: relative;
+      background: #fff;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 820px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      animation: panelIn 0.35s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes panelIn {
+      from { opacity:0; transform:translateY(30px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .contact-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s;
+    }
+    .contact-close:hover { background: #e2e8f0; }
+
+    /* submit button */
+    .req-submit {
+      width: 170px;
+      padding: 13px 0;
+      background: linear-gradient(135deg, #0b6b61 0%, #0d8a7a 100%);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 14px rgba(11,107,97,0.28);
+      transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .req-submit::after {
+      content:'';
+      position:absolute; inset:0;
+      background: linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.18) 50%,transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.45s ease;
+    }
+    .req-submit:hover::after { transform: translateX(100%); }
+    .req-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(11,107,97,0.36);
+    }
+    .req-submit:active { transform: translateY(0); filter: brightness(0.93); }
+  </style>
+  <script>
+    function showContact(e) {
+      e.preventDefault();
+      document.getElementById('contactOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function hideContact() {
+      document.getElementById('contactOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.getElementById('contactOverlay').addEventListener('click', function(e) {
+      if (e.target === this) hideContact();
+    });
+    function toggleDial(e) {
+      e.stopPropagation();
+      var dd = document.getElementById('dialList');
+      dd.classList.toggle('open');
+      if (dd.classList.contains('open')) setTimeout(function(){ document.getElementById('dialSearch').focus(); }, 60);
+    }
+    function pickDial(code2, name, code) {
+      document.getElementById('flagImg').src = 'https://flagcdn.com/w40/' + code2 + '.png';
+      document.getElementById('flagImg').alt = code2.toUpperCase();
+      document.querySelector('#flagBtn .flag-code').textContent = code;
+      document.getElementById('dialList').classList.remove('open');
+      document.getElementById('dialSearch').value = '';
+      filterDial('');
+    }
+    function filterDial(q) {
+      var items = document.querySelectorAll('#dialUl li');
+      q = q.toLowerCase();
+      items.forEach(function(li) {
+        var name = li.querySelector('.dl-name').textContent.toLowerCase();
+        var code = li.querySelector('.dl-code').textContent.toLowerCase();
+        li.style.display = (!q || name.includes(q) || code.includes(q)) ? '' : 'none';
+      });
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#phoneWrap') && !e.target.closest('#dialList')) {
+        document.getElementById('dialList').classList.remove('open');
+        document.getElementById('dialSearch').value = '';
+        filterDial('');
+      }
+    });
+    function submitReq() {
+      var desc  = document.getElementById('req-desc').value.trim();
+      var phone = document.getElementById('req-phone').value.trim();
+      var name  = document.getElementById('req-name').value.trim();
+      var code  = document.querySelector('#flagBtn .flag-code').textContent.trim();
+      var errD  = document.getElementById('err-desc');
+      var errP  = document.getElementById('err-phone');
+      errD.classList.toggle('show', !desc);
+      errP.classList.toggle('show', !phone);
+      if (!desc || !phone) return;
+      var msg = 'Name: ' + (name || 'N/A') + '%0APhone: ' + code + phone + '%0ARequirement: ' + encodeURIComponent(desc);
+      window.open('https://wa.me/919715699650?text=' + msg, '_blank');
+    }
+  </script>
+</body>
+</html>

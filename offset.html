@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCG Offset Printing</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.cpill{display:inline-flex;align-items:center;justify-content:center;padding:0.68rem 0.95rem;border-radius:999px;background:rgba(255,255,255,0.68);border:1px solid rgba(34,197,94,0.16);font-weight:700;font-size:0.92rem;color:var(--text);backdrop-filter:blur(12px);cursor:pointer;font-family:inherit;}
+.cpill:hover{transform:translateY(-3px) scale(1.06);box-shadow:0 10px 28px rgba(34,197,94,0.24);background:rgba(255,255,255,0.96);}
+#cOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;}
+.cPanel{position:relative;background:#fff;border-radius:16px;width:90%;max-width:820px;max-height:90vh;overflow-y:auto;padding:32px;}
+.cClose{position:absolute;top:14px;right:16px;background:#f1f5f9;border:none;border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;color:#334155;}
+.rForm{display:flex;flex-direction:column;gap:16px;}
+.rFs{border:1.5px solid #b0b8c1;border-radius:7px;padding:6px 14px 12px;margin:0;background:#fff;}
+.rFs:focus-within{border-color:#0b6b61;box-shadow:0 0 0 3px rgba(11,107,97,.13);}
+.rLg{font-size:.78rem;color:#6b7280;padding:0 5px;font-weight:500;}
+.rFs textarea,.rFs input[type=text]{width:100%;border:none;outline:none;background:transparent;font:inherit;font-size:.97rem;color:#1a1a2e;resize:vertical;padding:2px 0;}
+.rFs textarea{min-height:82px;}
+.rFs textarea::placeholder,.rFs input::placeholder{color:#b0b8c1;}
+.pWrap{display:flex;align-items:center;border:1.5px solid #b0b8c1;border-radius:7px;background:#fff;}
+.pWrap:focus-within{border-color:#0b6b61;box-shadow:0 0 0 3px rgba(11,107,97,.13);}
+.fBtn{display:flex;align-items:center;gap:4px;background:none;border:none;padding:10px 4px 10px 10px;cursor:pointer;font-family:inherit;}
+.fImg{width:26px;height:18px;object-fit:cover;border-radius:3px;}
+.fArrow{font-size:.65rem;color:#6b7280;}
+.fCode{font-size:.95rem;font-weight:700;color:#1a1a2e;}
+.fDiv{width:1px;height:22px;background:#d1d5db;flex-shrink:0;}
+#rPhone{flex:1;border:none;outline:none;padding:11px 8px;font:inherit;font-size:.97rem;color:#1a1a2e;background:transparent;}
+#rPhone::placeholder{color:#b0b8c1;}
+.dDrop{display:none;background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;min-width:230px;box-shadow:0 10px 32px rgba(0,0,0,.13);overflow:hidden;margin-top:5px;}
+.dSearch{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:.88rem;outline:none;background:#fff;color:#1a1a2e;}
+.dSearch:focus{border-color:#0b6b61;}
+.dUl{list-style:none;margin:0;padding:4px 0;max-height:210px;overflow-y:auto;}
+.dUl li{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;font-size:.91rem;color:#1a1a2e;}
+.dUl li:hover{background:#f0fdf4;}
+.dUl li img{width:24px;height:16px;object-fit:cover;border-radius:2px;flex-shrink:0;}
+.dN{flex:1;font-weight:500;}
+.dC{color:#6b7280;font-size:.83rem;font-weight:600;}
+.rErr{color:#c62828;font-size:.82rem;text-align:right;margin:3px 0 0;display:none;}
+.rErr.show{display:block;}
+.rSub{width:170px;padding:13px 0;background:linear-gradient(135deg,#0b6b61,#0d8a7a);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:1rem;cursor:pointer;}
+</style>
+</head>
+<body class="offset-page">
+<div class="page-shell">
+  <header class="site-header offset-header">
+    <div class="brand-lockup">
+      <div class="logo-frame" aria-hidden="true">
+        <img src="assets/ocg-logo.png" alt="OCG logo" class="brand-logo">
+      </div>
+      <div class="brand-copy">
+        <p class="eyebrow">Offset Printing</p>
+        <h1>Print finishes, packaging, and machine output in one gallery.</h1>
+        <p class="lede">Each image below is shown separately so the offset work is easy to scan, present, and explain.</p>
+      </div>
+    </div>
+    <nav class="header-actions" aria-label="Primary">
+      <a class="status-pill" href="index.html">Home</a>
+      <span class="cpill" id="cBtn">Contact</span>
+      <a class="status-pill" href="index.html#services">About us</a>
+    </nav>
+  </header>
+
+  <main class="offset-main">
+    <section class="offset-hero">
+      <div>
+        <p class="eyebrow">OCG Osho Colour Galaxy</p>
+        <h2>Offset printing projects with a clean presentation.</h2>
+        <p>This page highlights the packaging, brochure, catalog, and machine images placed in the project.</p>
+      </div>
+    </section>
+
+    <section class="offset-gallery" aria-label="Offset printing gallery">
+      <article class="offset-card">
+        <img src="image/Screenshot%202026-07-17%20142050.png" alt="Packaging box designs" class="offset-image">
+        <div class="offset-copy"><h3>Packaging Concepts</h3><p>Colorful custom box layouts for premium packaging with a bold shelf presence.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot 2026-07-17 163456.jpg" alt="Brochure spread" class="offset-image">
+        <div class="offset-copy"><h3>Brochure Design</h3><p>A clean brochure spread for brands that want to explain services in a polished print format.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot%202026-07-17%20142445.png" alt="Catalog pages" class="offset-image">
+        <div class="offset-copy"><h3>Catalog Layouts</h3><p>Catalog visuals suited for product collections and multi-page promotional print work.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot%202026-07-17%20142613.png" alt="Sweet box packaging" class="offset-image">
+        <div class="offset-copy"><h3>Food Packaging</h3><p>Packaging artwork for confectionery and food brands where clear labeling and strong colors matter.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot%202026-07-17%20142709.png" alt="Mithai packaging" class="offset-image">
+        <div class="offset-copy"><h3>Traditional Mithai Packs</h3><p>Bright festive packaging for seasonal sales, gifting, and regional sweet shop branding.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot 2026-07-17 154052.jpg" alt="Calender" class="offset-image">
+        <div class="offset-copy"><h3>Calender</h3><p>Custom-designed calender printed with vibrant colors and detailed artwork.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot 2026-07-17 154816.jpg" alt="Diaries" class="offset-image">
+        <div class="offset-copy"><h3>Diaries</h3><p>Custom-designed diaries combining functionality with aesthetic appeal.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot 2026-07-17 160132.jpg" alt="Corrugated box" class="offset-image">
+        <div class="offset-copy"><h3>Corrugated Box</h3><p>Different sizes of corrugated boxes providing durable protection during shipping and storage.</p></div>
+      </article>
+      <article class="offset-card">
+        <img src="image/Screenshot 2026-07-17 170432.jpg" alt="Printed corrugated boxes" class="offset-image">
+        <div class="offset-copy"><h3>Printed Corrugated Boxes</h3><p>Printed corrugated boxes providing durable protection during shipping and storage.</p></div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>OCG Automation - offset printing visuals, one image at a time.</p>
+  </footer>
+</div>
+
+<!-- CONTACT OVERLAY -->
+<div id="cOverlay">
+  <div class="cPanel">
+    <button class="cClose" id="cClose" type="button">&#10005;</button>
+    <div style="margin-bottom:18px;">
+      <h3 style="margin:0 0 8px;"><u>Contact</u></h3>
+      <p style="margin:0;">Nagarajan.T</p>
+      <p style="margin:0;color:#0b6b61;font-weight:600;">Automation Engineer</p>
+      <a href="mailto:oshocolorgalaxyautomation.com" style="font-size:0.9rem;color:#2563eb;">oshocolorgalaxyautomation.com</a>
+      <p style="margin:4px 0 0;font-size:0.88rem;color:#64748b;">3/1289, Meera Colony, Sivakasi - 626189</p>
+    </div>
+    <div class="rForm">
+      <div>
+        <fieldset class="rFs"><legend class="rLg">Describe Your Requirement</legend>
+          <textarea id="rDesc" placeholder="I would like to..."></textarea>
+        </fieldset>
+        <p class="rErr" id="eDesc">Kindly Describe Your Requirement.</p>
+      </div>
+      <div>
+        <div class="pWrap" id="pWrap">
+          <button type="button" class="fBtn" id="fBtn">
+            <img class="fImg" id="fImg" src="https://flagcdn.com/w40/in.png" alt="IN">
+            <span class="fArrow">&#9660;</span>
+            <span class="fCode">+91</span>
+          </button>
+          <div class="fDiv"></div>
+          <input type="tel" id="rPhone" placeholder="Enter Your Number">
+        </div>
+        <div class="dDrop" id="dDrop">
+          <div style="padding:8px 10px 6px;border-bottom:1px solid #f0f0f0;background:#fafafa;">
+            <input type="text" class="dSearch" id="dSearch" placeholder="&#128269; Search country...">
+          </div>
+          <ul class="dUl" id="dUl">
+            <li data-c="in" data-d="+91"><img src="https://flagcdn.com/w40/in.png" alt=""><span class="dN">India</span><span class="dC">+91</span></li>
+            <li data-c="us" data-d="+1"><img src="https://flagcdn.com/w40/us.png" alt=""><span class="dN">USA</span><span class="dC">+1</span></li>
+            <li data-c="gb" data-d="+44"><img src="https://flagcdn.com/w40/gb.png" alt=""><span class="dN">UK</span><span class="dC">+44</span></li>
+            <li data-c="au" data-d="+61"><img src="https://flagcdn.com/w40/au.png" alt=""><span class="dN">Australia</span><span class="dC">+61</span></li>
+            <li data-c="ae" data-d="+971"><img src="https://flagcdn.com/w40/ae.png" alt=""><span class="dN">UAE</span><span class="dC">+971</span></li>
+            <li data-c="sg" data-d="+65"><img src="https://flagcdn.com/w40/sg.png" alt=""><span class="dN">Singapore</span><span class="dC">+65</span></li>
+            <li data-c="ca" data-d="+1"><img src="https://flagcdn.com/w40/ca.png" alt=""><span class="dN">Canada</span><span class="dC">+1</span></li>
+            <li data-c="de" data-d="+49"><img src="https://flagcdn.com/w40/de.png" alt=""><span class="dN">Germany</span><span class="dC">+49</span></li>
+            <li data-c="fr" data-d="+33"><img src="https://flagcdn.com/w40/fr.png" alt=""><span class="dN">France</span><span class="dC">+33</span></li>
+            <li data-c="jp" data-d="+81"><img src="https://flagcdn.com/w40/jp.png" alt=""><span class="dN">Japan</span><span class="dC">+81</span></li>
+            <li data-c="cn" data-d="+86"><img src="https://flagcdn.com/w40/cn.png" alt=""><span class="dN">China</span><span class="dC">+86</span></li>
+            <li data-c="br" data-d="+55"><img src="https://flagcdn.com/w40/br.png" alt=""><span class="dN">Brazil</span><span class="dC">+55</span></li>
+            <li data-c="my" data-d="+60"><img src="https://flagcdn.com/w40/my.png" alt=""><span class="dN">Malaysia</span><span class="dC">+60</span></li>
+            <li data-c="za" data-d="+27"><img src="https://flagcdn.com/w40/za.png" alt=""><span class="dN">South Africa</span><span class="dC">+27</span></li>
+            <li data-c="sa" data-d="+966"><img src="https://flagcdn.com/w40/sa.png" alt=""><span class="dN">Saudi Arabia</span><span class="dC">+966</span></li>
+            <li data-c="kr" data-d="+82"><img src="https://flagcdn.com/w40/kr.png" alt=""><span class="dN">South Korea</span><span class="dC">+82</span></li>
+            <li data-c="id" data-d="+62"><img src="https://flagcdn.com/w40/id.png" alt=""><span class="dN">Indonesia</span><span class="dC">+62</span></li>
+            <li data-c="ph" data-d="+63"><img src="https://flagcdn.com/w40/ph.png" alt=""><span class="dN">Philippines</span><span class="dC">+63</span></li>
+            <li data-c="nz" data-d="+64"><img src="https://flagcdn.com/w40/nz.png" alt=""><span class="dN">New Zealand</span><span class="dC">+64</span></li>
+            <li data-c="it" data-d="+39"><img src="https://flagcdn.com/w40/it.png" alt=""><span class="dN">Italy</span><span class="dC">+39</span></li>
+          </ul>
+        </div>
+        <p class="rErr" id="ePhone">Please enter your mobile number.</p>
+      </div>
+      <div>
+        <fieldset class="rFs"><legend class="rLg">Name</legend>
+          <input type="text" id="rName" placeholder="Enter your name">
+        </fieldset>
+      </div>
+      <button type="button" class="rSub" id="rSub">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var ov = document.getElementById('cOverlay');
+var dd = document.getElementById('dDrop');
+
+document.getElementById('cBtn').onclick = function() {
+  ov.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+document.getElementById('cClose').onclick = function() {
+  ov.style.display = 'none';
+  document.body.style.overflow = '';
+};
+ov.onclick = function(e) {
+  if (e.target === ov) { ov.style.display = 'none'; document.body.style.overflow = ''; }
+};
+document.getElementById('fBtn').onclick = function(e) {
+  e.stopPropagation();
+  dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+};
+document.getElementById('dSearch').oninput = function() {
+  var q = this.value.toLowerCase();
+  document.querySelectorAll('#dUl li').forEach(function(li) {
+    li.style.display = (!q || li.querySelector('.dN').textContent.toLowerCase().includes(q) || li.dataset.d.includes(q)) ? '' : 'none';
+  });
+};
+document.getElementById('dUl').onclick = function(e) {
+  var li = e.target.closest('li');
+  if (!li) return;
+  document.getElementById('fImg').src = 'https://flagcdn.com/w40/' + li.dataset.c + '.png';
+  document.querySelector('#fBtn .fCode').textContent = li.dataset.d;
+  dd.style.display = 'none';
+  document.getElementById('dSearch').value = '';
+  document.querySelectorAll('#dUl li').forEach(function(l) { l.style.display = ''; });
+};
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#pWrap') && !e.target.closest('#dDrop')) dd.style.display = 'none';
+});
+document.getElementById('rSub').onclick = function() {
+  var desc = document.getElementById('rDesc').value.trim();
+  var phone = document.getElementById('rPhone').value.trim();
+  var name = document.getElementById('rName').value.trim();
+  var code = document.querySelector('#fBtn .fCode').textContent.trim();
+  document.getElementById('eDesc').classList.toggle('show', !desc);
+  document.getElementById('ePhone').classList.toggle('show', !phone);
+  if (!desc || !phone) return;
+  window.open('https://wa.me/919715699650?text=Name: ' + (name||'N/A') + '%0APhone: ' + code + phone + '%0ARequirement: ' + encodeURIComponent(desc), '_blank');
+};
+</script>
+</body>
+</html>

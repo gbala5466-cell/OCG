@@ -1,0 +1,656 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCG Automation Solutions</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Contact Overlay ── */
+    .contact-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+    }
+    .contact-overlay.open { display: flex; }
+    .contact-panel {
+      position: relative;
+      background: #fff;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 820px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      animation: panelIn 0.35s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes panelIn {
+      from { opacity:0; transform:translateY(30px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .contact-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 34px; height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s;
+    }
+    .contact-close:hover { background: #e2e8f0; }
+    /* ── Form styles ── */
+    .req-form { display:flex; flex-direction:column; gap:16px; }
+    .req-fieldset { border:1.5px solid #b0b8c1; border-radius:7px; padding:6px 14px 12px; margin:0; background:#fff; transition:border-color .22s,box-shadow .22s; }
+    .req-fieldset:focus-within { border-color:#0b6b61; box-shadow:0 0 0 3px rgba(11,107,97,.13); }
+    .req-legend { font-size:.78rem; color:#6b7280; padding:0 5px; font-weight:500; }
+    .req-fieldset textarea, .req-fieldset input[type="text"] { width:100%; border:none; outline:none; background:transparent; font:inherit; font-size:.97rem; color:#1a1a2e; resize:vertical; padding:2px 0; }
+    .req-fieldset textarea { min-height:82px; }
+    .req-fieldset textarea::placeholder, .req-fieldset input::placeholder { color:#b0b8c1; }
+    .phone-wrap { position:relative; display:flex; align-items:center; border:1.5px solid #b0b8c1; border-radius:7px; background:#fff; overflow:visible; transition:border-color .22s,box-shadow .22s; }
+    .phone-wrap:focus-within { border-color:#0b6b61; box-shadow:0 0 0 3px rgba(11,107,97,.13); }
+    .flag-btn { display:flex; align-items:center; gap:1px; background:none; border:none; padding:10px 4px 10px 10px; cursor:pointer; font-family:inherit; border-radius:6px 0 0 6px; }
+    .flag-btn:hover { background:rgba(11,107,97,.07); }
+    .flag-img { width:26px; height:18px; object-fit:cover; border-radius:3px; box-shadow:0 1px 4px rgba(0,0,0,.22); display:block; flex-shrink:0; }
+    .flag-arrow { font-size:.65rem; color:#6b7280; margin-top:1px; }
+    .flag-code { font-size:.95rem; font-weight:700; color:#1a1a2e; }
+    .flag-divider { width:1px; height:22px; background:#d1d5db; flex-shrink:0; }
+    #req-phone { flex:1; border:none; outline:none; padding:11px 8px; font:inherit; font-size:.97rem; color:#1a1a2e; background:transparent; }
+    #req-phone::placeholder { color:#b0b8c1; }
+    .dial-dropdown { display:none; position:static; z-index:9999; background:#fff; border:1.5px solid #e5e7eb; border-radius:12px; min-width:230px; box-shadow:0 10px 32px rgba(0,0,0,.13); overflow:hidden; margin-top:5px; }
+    .dial-dropdown.open { display:block; }
+    .dial-search-wrap { padding:8px 10px 6px; border-bottom:1px solid #f0f0f0; background:#fafafa; }
+    .dial-search { width:100%; border:1.5px solid #e2e8f0; border-radius:7px; padding:7px 10px; font-size:.88rem; outline:none; background:#fff; color:#1a1a2e; }
+    .dial-search:focus { border-color:#0b6b61; }
+    .dial-ul { list-style:none; margin:0; padding:4px 0; max-height:210px; overflow-y:auto; scrollbar-width:thin; }
+    .dial-ul li { display:flex; align-items:center; gap:10px; padding:9px 14px; cursor:pointer; font-size:.91rem; color:#1a1a2e; }
+    .dial-ul li:hover { background:#f0fdf4; }
+    .dial-ul li img { width:24px; height:16px; object-fit:cover; border-radius:2px; flex-shrink:0; }
+    .dl-name { flex:1; font-weight:500; }
+    .dl-code { color:#6b7280; font-size:.83rem; font-weight:600; }
+    .req-err { color:#c62828; font-size:.82rem; text-align:right; margin:3px 0 0; display:none; }
+    .req-err.show { display:block; }
+    .req-submit { width:170px; padding:13px 0; background:linear-gradient(135deg,#0b6b61,#0d8a7a); color:#fff; border:none; border-radius:9px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 4px 14px rgba(11,107,97,.28); transition:transform .18s,box-shadow .18s; }
+    .req-submit:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(11,107,97,.36); }
+  </style>
+  <style>
+    .automation-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 40px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .automation-hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .automation-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .gallery-item {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-caption {
+      padding: 20px;
+      background: #f8f9fa;
+      text-align: center;
+    }
+
+    .automation-content {
+      background: #f0f4ff;
+      padding: 40px;
+      border-radius: 12px;
+      margin: 40px 0;
+    }
+
+    .automation-content h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .automation-content p {
+      line-height: 1.8;
+      color: #333;
+      margin-bottom: -20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    .back-link:hover {
+      background: #764ba2;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+    }
+
+    .feature-box {
+      background: white;
+      padding: 25px;
+      border-left: 4px solid #667eea;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-box h4 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .automation-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      padding: 30px 20px;
+      margin: 40px 0;
+      border-top: 1px solid #e0e0e0;
+      border-bottom: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+    }
+
+    .automation-nav a,
+    .automation-nav button {
+      text-decoration: none;
+      color: #333;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      background: #f7f9ff;
+      border: 1px solid #e3eaff;
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font: inherit;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.06);
+    }
+
+    .automation-nav a:hover,
+    .automation-nav button:hover,
+    .automation-nav button:focus-visible {
+      color: #667eea;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.12);
+    }
+
+    .automation-nav a::after,
+    .automation-nav button::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #667eea;
+      transition: width 0.3s ease;
+    }
+
+    .automation-nav a:hover::after,
+    .automation-nav button:hover::after,
+    .automation-nav button:focus-visible::after,
+    .automation-nav button.active::after {
+      width: 100%;
+    }
+
+    .automation-nav .more-link {
+      color: #0088cc;
+    }
+
+    .automation-nav .more-link:hover {
+      color: #006699;
+    }
+
+    .product-panel {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      margin: 0 0 0;
+      padding: 0 20px;
+      border: 1px solid rgba(102, 126, 234, 0.12);
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ffffff 0%, #f4f7ff 100%);
+      box-shadow: 0 16px 40px rgba(102, 126, 234, 0.12);
+      transition: max-height 0.35s ease, opacity 0.35s ease, padding 0.35s ease, margin 0.35s ease;
+    }
+
+    .product-panel.open {
+      max-height: 320px;
+      opacity: 1;
+      margin: 0 0 24px;
+      padding: 20px;
+    }
+
+    .product-search {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid #dce6ff;
+      border-radius: 10px;
+      outline: none;
+      font-size: 0.95rem;
+      color: #30405f;
+      background: #fdfdff;
+    }
+
+    .product-search:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+    }
+
+    .product-list-wrap {
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .product-list-wrap::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .product-list-wrap::-webkit-scrollbar-thumb {
+      background: #c7d2fe;
+      border-radius: 999px;
+    }
+
+    .product-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .product-list li {
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f9fbff 0%, #eef3ff 100%);
+      color: #30405f;
+      border: 1px solid #e2ebff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      transform: translateY(8px);
+      opacity: 0;
+      transition: transform 0.25s ease, opacity 0.25s ease, background 0.2s ease;
+    }
+
+    .product-list li:hover {
+      background: linear-gradient(135deg, #eef4ff 0%, #e4ebff 100%);
+      transform: translateX(3px);
+    }
+
+    .product-panel.open .product-list li {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .product-panel.open .product-list li:nth-child(2) {
+      transition-delay: 0.05s;
+    }
+
+    .product-panel.open .product-list li:nth-child(3) {
+      transition-delay: 0.1s;
+    }
+
+    .product-panel.open .product-list li:nth-child(4) {
+      transition-delay: 0.15s;
+    }
+
+    .product-panel.open .product-list li:nth-child(5) {
+      transition-delay: 0.2s;
+    }
+
+    .product-panel.open .product-list li:nth-child(6) {
+      transition-delay: 0.25s;
+    }
+
+    /* Requirements card (inline fallback) */
+    .requirements-card {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244,247,255,0.9));
+      border: 1px solid rgba(102,126,234,0.08);
+      box-shadow: 0 10px 30px rgba(102,126,234,0.06);
+    }
+
+    .requirements-illustration {
+      width: 160px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(102,126,234,0.12);
+      transform-origin: center;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .requirement-title { margin: 0 0 8px 0; font-weight: 800; color: #1f2d5a; font-size: 1.05rem; }
+    .requirement-grid { display: grid; gap: 0.6rem; }
+    .requirement-field { display:flex; flex-direction:column; gap:6px; font-weight:700; color: #5d7567; }
+    .requirement-field input, .requirement-field select, .requirement-field textarea {
+      padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(34,58,120,0.06); background: linear-gradient(180deg,#fff,#fbfdff); font: inherit; color: #163725;
+      transition: box-shadow .22s cubic-bezier(.2,.9,.2,1), transform .15s ease, border-color .15s ease;
+    }
+    .requirement-field textarea { min-height:110px; resize: vertical; }
+    .requirement-field input:focus, .requirement-field select:focus, .requirement-field textarea:focus {
+      outline:none; border-color:#667eea; box-shadow:0 12px 36px rgba(102,122,234,0.14); transform: translateY(-4px);
+    }
+    @keyframes float { 0%{transform:translateY(0) rotate(-1deg);} 50%{transform:translateY(-8px) rotate(1deg);} 100%{transform:translateY(0) rotate(-1deg);} }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="brand-lockup">
+        <div class="logo-frame" aria-hidden="true">
+          <img src="assets/ocg-logo.png" alt="OCG logo" class="brand-logo" />
+        </div>
+        <div class="brand-copy">
+          <p class="eyebrow">OSHO COLOR GALAXY Automation</p>
+          <h1>Advanced Automation Solutions</h1>
+          <p class="lede">Precision automation systems for modern printing and production facilities.</p>
+        </div>
+      </div>
+
+      <nav class="header-actions" aria-label="Primary">
+        <a class="btn primary" href="index.html">Home</a>
+        <a class="btn primary" href="offset.html">Offset</a>
+      </nav>
+    </header>
+
+    
+    <main style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+      <nav class="automation-nav" aria-label="Automation sections">
+        <button type="button" id="productsToggle" aria-expanded="false" aria-controls="productList">Products</button>
+        <a href="#solutions">Robots</a>
+        <a class="status-pill" href="#" onclick="showContact(event)">Contact</a>
+        
+        <a href="#about">About Us</a>
+        <a href="#more" class="more-link">More</a>
+      </nav>
+
+      <div class="product-panel" id="productList" role="region" aria-live="polite">
+        <input type="text" class="product-search" id="productSearch" placeholder="Search products..." />
+        <div class="product-list-wrap">
+          <ul class="product-list" id="productItems">
+            <li data-name="spm">SPM</li>
+            <li data-name="rotary welding">Rotary Welding</li>
+            <li data-name="linear welding">Linear Welding</li>
+            <li data-name="spot welding">Spot Welding</li>
+            <li data-name="seam welding">Seam Welding</li>
+            <li data-name="projection welding">Projection Welding</li>
+          </ul>
+        </div>
+      </div>
+      
+
+      <section class="automation-hero">
+        <h2>Automation Excellence</h2>
+        <p>Transforming production workflows with cutting-edge automation technology. Increase efficiency, reduce costs, and maintain superior quality.</p>
+      </section>
+
+      <section class="automation-content">
+        <h3>🤖 Our Automation Capabilities</h3>
+        <p>
+          OCG specializes in deploying integrated automation solutions tailored to the printing and manufacturing industry. 
+          Our systems are designed to maximize throughput while maintaining exceptional quality standards.
+        </p>
+        <p>
+          With over a decade of experience, we understand the unique challenges faced by modern production facilities. 
+          Our engineering team works closely with clients to develop customized solutions that fit their specific operational needs.
+        </p>
+      </section>
+
+      <section class="feature-grid">
+        <div class="feature-box">
+          <h4>⚙️ System Integration</h4>
+          <p>Seamless integration with existing production lines and equipment for minimal downtime during deployment.</p>
+        </div>
+        <div class="feature-box">
+          <h4>📊 Real-time Monitoring</h4>
+          <p>Advanced analytics and monitoring dashboards for complete visibility into production metrics and performance data.</p>
+        </div>
+        <div class="feature-box">
+          <h4>🔧 Technical Support</h4>
+          <p>24/7 technical support and maintenance services to ensure your automation systems operate at peak efficiency.</p>
+        </div>
+        <div class="feature-box">
+          <h4>🎯 Precision Control</h4>
+          <p>Micron-level precision control systems for consistent, high-quality output in every production cycle.</p>
+        </div>
+      </section>
+
+      
+<section class="automation-content">
+        <h3>💼 Why Choose OCG Automation?</h3>
+        <ul style="line-height: 2; color: #333;">
+          <li>✓ Industry-leading expertise in printing and manufacturing automation</li>
+          <li>✓ Proven track record with 2 0+ successful installations</li>
+          <li>✓ Customized solutions designed for your specific production needs</li>
+          <li>✓ Comprehensive training and ongoing technical support</li>
+          <li>✓ ROI-focused approach with measurable efficiency gains</li>
+          <li>✓ State-of-the-art technology with continuous innovation</li>
+        </ul>
+      </section>
+
+      <section class="automation-content">
+        <h3>📞 Get Started Today</h3>
+        <p>
+          Ready to transform your production facility with advanced automation? 
+          Contact our automation specialists to discuss your requirements and receive a customized proposal.
+        </p>
+        <p>
+          <strong>Nagarajan.T - Automation Engineer</strong><br>
+          <a  style="color: #667eea; text-decoration: none;">oshocolorgalaxy@gmail.com</a><br>
+          Location: 3/1289 Meera Colony, Sivakasi-626189
+        </p>
+
+        <!-- Requirements moved to the main contact on the home page. Use the Contact link to open the requirements form on the index page. -->
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>OCG Automation - Precision Solutions for Modern Manufacturing | © 2026 All Rights Reserved</p>
+    </footer>
+  </div>
+
+  <!-- Contact Overlay -->
+  <div class="contact-overlay" id="contactOverlay">
+    <div class="contact-panel">
+      <button class="contact-close" onclick="hideContact()" aria-label="Close">&#10005;</button>
+      <div class="contact-copy" style="margin-bottom:18px;">
+        <h3 style="margin:0 0 8px;"><u>Contact</u></h3>
+        <p style="margin:0;">Nagarajan.T</p>
+        <p style="margin:0;color:#667eea;font-weight:600;">Automation Engineer</p>
+        <a href="mailto:oshocolorgalaxyautomation.com" style="font-size:0.9rem;color:#2563eb;">oshocolorgalaxyautomation.com</a>
+        <p style="margin:4px 0 0;font-size:0.88rem;color:#64748b;">3/1289, Meera Colony, Sivakasi - 626189</p>
+      </div>
+      <div class="req-form">
+        <div class="req-field">
+          <fieldset class="req-fieldset">
+            <legend class="req-legend">Describe Your Requirement</legend>
+            <textarea id="req-desc" placeholder="I would like to..."></textarea>
+          </fieldset>
+          <p class="req-err" id="err-desc">Kindly Describe Your Requirement.</p>
+        </div>
+        <div class="req-field">
+          <div class="phone-wrap" id="phoneWrap">
+            <button type="button" class="flag-btn" id="flagBtn" onclick="toggleDial(event)">
+              <img class="flag-img" id="flagImg" src="https://flagcdn.com/w40/in.png" alt="IN" />
+              <span class="flag-arrow">&#9660;</span>
+              <span class="flag-code">+91</span>
+            </button>
+            <div class="flag-divider"></div>
+            <input type="tel" id="req-phone" placeholder="Enter Your Number" />
+          </div>
+          <div class="dial-dropdown" id="dialList">
+            <div class="dial-search-wrap">
+              <input type="text" class="dial-search" id="dialSearch" placeholder="&#128269; Search country..." oninput="filterDial(this.value)" onclick="event.stopPropagation()" />
+            </div>
+            <ul class="dial-ul" id="dialUl">
+              <li onclick="pickDial('in','India','+91')"><img src="https://flagcdn.com/w40/in.png" alt="IN"/><span class="dl-name">India</span><span class="dl-code">+91</span></li>
+              <li onclick="pickDial('us','USA','+1')"><img src="https://flagcdn.com/w40/us.png" alt="US"/><span class="dl-name">USA</span><span class="dl-code">+1</span></li>
+              <li onclick="pickDial('gb','UK','+44')"><img src="https://flagcdn.com/w40/gb.png" alt="GB"/><span class="dl-name">UK</span><span class="dl-code">+44</span></li>
+              <li onclick="pickDial('au','Australia','+61')"><img src="https://flagcdn.com/w40/au.png" alt="AU"/><span class="dl-name">Australia</span><span class="dl-code">+61</span></li>
+              <li onclick="pickDial('ae','UAE','+971')"><img src="https://flagcdn.com/w40/ae.png" alt="AE"/><span class="dl-name">UAE</span><span class="dl-code">+971</span></li>
+              <li onclick="pickDial('sg','Singapore','+65')"><img src="https://flagcdn.com/w40/sg.png" alt="SG"/><span class="dl-name">Singapore</span><span class="dl-code">+65</span></li>
+              <li onclick="pickDial('ca','Canada','+1')"><img src="https://flagcdn.com/w40/ca.png" alt="CA"/><span class="dl-name">Canada</span><span class="dl-code">+1</span></li>
+              <li onclick="pickDial('de','Germany','+49')"><img src="https://flagcdn.com/w40/de.png" alt="DE"/><span class="dl-name">Germany</span><span class="dl-code">+49</span></li>
+              <li onclick="pickDial('fr','France','+33')"><img src="https://flagcdn.com/w40/fr.png" alt="FR"/><span class="dl-name">France</span><span class="dl-code">+33</span></li>
+              <li onclick="pickDial('jp','Japan','+81')"><img src="https://flagcdn.com/w40/jp.png" alt="JP"/><span class="dl-name">Japan</span><span class="dl-code">+81</span></li>
+              <li onclick="pickDial('cn','China','+86')"><img src="https://flagcdn.com/w40/cn.png" alt="CN"/><span class="dl-name">China</span><span class="dl-code">+86</span></li>
+              <li onclick="pickDial('br','Brazil','+55')"><img src="https://flagcdn.com/w40/br.png" alt="BR"/><span class="dl-name">Brazil</span><span class="dl-code">+55</span></li>
+              <li onclick="pickDial('my','Malaysia','+60')"><img src="https://flagcdn.com/w40/my.png" alt="MY"/><span class="dl-name">Malaysia</span><span class="dl-code">+60</span></li>
+              <li onclick="pickDial('za','South Africa','+27')"><img src="https://flagcdn.com/w40/za.png" alt="ZA"/><span class="dl-name">South Africa</span><span class="dl-code">+27</span></li>
+              <li onclick="pickDial('sa','Saudi Arabia','+966')"><img src="https://flagcdn.com/w40/sa.png" alt="SA"/><span class="dl-name">Saudi Arabia</span><span class="dl-code">+966</span></li>
+              <li onclick="pickDial('kr','South Korea','+82')"><img src="https://flagcdn.com/w40/kr.png" alt="KR"/><span class="dl-name">South Korea</span><span class="dl-code">+82</span></li>
+              <li onclick="pickDial('id','Indonesia','+62')"><img src="https://flagcdn.com/w40/id.png" alt="ID"/><span class="dl-name">Indonesia</span><span class="dl-code">+62</span></li>
+              <li onclick="pickDial('ph','Philippines','+63')"><img src="https://flagcdn.com/w40/ph.png" alt="PH"/><span class="dl-name">Philippines</span><span class="dl-code">+63</span></li>
+              <li onclick="pickDial('nz','New Zealand','+64')"><img src="https://flagcdn.com/w40/nz.png" alt="NZ"/><span class="dl-name">New Zealand</span><span class="dl-code">+64</span></li>
+              <li onclick="pickDial('it','Italy','+39')"><img src="https://flagcdn.com/w40/it.png" alt="IT"/><span class="dl-name">Italy</span><span class="dl-code">+39</span></li>
+            </ul>
+          </div>
+          <p class="req-err" id="err-phone">Please enter your mobile number.</p>
+        </div>
+        <div class="req-field">
+          <fieldset class="req-fieldset">
+            <legend class="req-legend">Name</legend>
+            <input type="text" id="req-name" placeholder="Enter your name" />
+          </fieldset>
+        </div>
+        <button class="req-submit" onclick="submitReq()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showContact(e) {
+      e.preventDefault();
+      document.getElementById('contactOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function hideContact() {
+      document.getElementById('contactOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.getElementById('contactOverlay').addEventListener('click', function(e) {
+      if (e.target === this) hideContact();
+    });
+    function toggleDial(e) {
+      e.stopPropagation();
+      document.getElementById('dialList').classList.toggle('open');
+    }
+    function pickDial(code2, name, code) {
+      document.getElementById('flagImg').src = 'https://flagcdn.com/w40/' + code2 + '.png';
+      document.getElementById('flagImg').alt = code2.toUpperCase();
+      document.querySelector('#flagBtn .flag-code').textContent = code;
+      document.getElementById('dialList').classList.remove('open');
+      document.getElementById('dialSearch').value = '';
+      filterDial('');
+    }
+    function filterDial(q) {
+      q = q.toLowerCase();
+      document.querySelectorAll('#dialUl li').forEach(function(li) {
+        var n = li.querySelector('.dl-name').textContent.toLowerCase();
+        var c = li.querySelector('.dl-code').textContent.toLowerCase();
+        li.style.display = (!q || n.includes(q) || c.includes(q)) ? '' : 'none';
+      });
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#phoneWrap') && !e.target.closest('#dialList'))
+        document.getElementById('dialList').classList.remove('open');
+    });
+    function submitReq() {
+      var desc  = document.getElementById('req-desc').value.trim();
+      var phone = document.getElementById('req-phone').value.trim();
+      var name  = document.getElementById('req-name').value.trim();
+      var code  = document.querySelector('#flagBtn .flag-code').textContent.trim();
+      document.getElementById('err-desc').classList.toggle('show', !desc);
+      document.getElementById('err-phone').classList.toggle('show', !phone);
+      if (!desc || !phone) return;
+      var msg = 'Name: ' + (name || 'N/A') + '%0APhone: ' + code + phone + '%0ARequirement: ' + encodeURIComponent(desc);
+      window.open('https://wa.me/919715699650?text=' + msg, '_blank');
+    }
+  </script>
+
+  <script>
+    const productsToggle = document.getElementById('productsToggle');
+    const productList = document.getElementById('productList');
+    const productSearch = document.getElementById('productSearch');
+    const productItems = document.querySelectorAll('#productItems li');
+
+    if (productsToggle && productList) {
+      productsToggle.addEventListener('click', () => {
+        const isOpen = productList.classList.toggle('open');
+        productsToggle.classList.toggle('active', isOpen);
+        productsToggle.setAttribute('aria-expanded', String(isOpen));
+        productsToggle.innerHTML = isOpen ? 'Products ▲' : 'Products ▼';
+
+        if (isOpen && productSearch) {
+          productSearch.focus();
+        }
+      });
+    }
+
+    if (productSearch) {
+      productSearch.addEventListener('input', () => {
+        const query = productSearch.value.trim().toLowerCase();
+
+        productItems.forEach((item) => {
+          const name = item.getAttribute('data-name') || item.textContent.toLowerCase();
+          item.style.display = name.includes(query) ? '' : 'none';
+        });
+      });
+    }
+  </script>
+</body>
+</html>
